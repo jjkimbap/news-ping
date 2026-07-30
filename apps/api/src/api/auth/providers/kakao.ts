@@ -29,6 +29,9 @@ export async function fetchKakaoProfile(code: string): Promise<ProviderProfile> 
       client_id: config.kakao.clientId,
       redirect_uri: config.kakao.redirectUri,
       code,
+      // Client Secret이 비활성화된 앱이면 값이 비어 있으므로 생략한다. 활성화된 앱은 필수이며,
+      // 누락 시 카카오 토큰 발급이 KOE101(invalid_client)로 실패한다.
+      ...(config.kakao.clientSecret ? { client_secret: config.kakao.clientSecret } : {}),
     }),
   });
 

@@ -209,4 +209,63 @@
 
 ---
 
+## 10. 개발 환경 및 운영 노트 (Dev/Ops Notes)
+
+> 실제 개발/디버깅 과정에서 확인된 사실들. PRD 자체는 아니지만 다음 세션이 바로 이어서 작업할 수 있도록 반드시 참고할 것. 특정 시점의 작업 로그는 `docs/devlog-2026-07-31.md` 참고.
+
+### 10.1 로컬 개발 서버
+- API: `npm run dev:api` (apps/api, 포트 4000, Express + tsx watch)
+- Web: `npm run dev:web` (apps/web, 포트 3000 기본이나 다른 프로세스가 점유하면 3001로 밀림 — LAN/모바일 테스트 시엔 카카오 리다이렉트 URI와 맞춰야 하므로 `cd apps/web && npx next dev -p 3001`로 포트를 명시 고정할 것)
+- `.env`(apps/api) / `.env.local`(apps/web)은 **프로세스 시작 시점에만 로드**된다(dotenv). 수정 후에는 반드시 서버를 완전히 재시작해야 반영된다 (hot reload 안 됨).
+- tsx watch가 크래시 후 포트를 계속 물고 있는 경우가 잦다. 재시작 전에 항상:
+  ```
+  pkill -9 -f "tsx watch src/server.ts"
+  lsof -iTCP -sTCP:LISTEN -P -n | grep :4000 | awk '{print $2}' | xargs -r kill -9
+  ```
+
+### 10.2 모바일/LAN 테스트
+- 맥의 로컬 IP는 `ipconfig getifaddr en0`로 확인 (⚠️ `curl ifconfig.me`는 공인 IP라 LAN 테스트에 쓸 수 없음). 이 프로젝트 개발 환경 기준 `192.168.35.65`.
+- `apps/web/next.config.ts`에 `allowedDevOrigins: ["192.168.35.65"]` 추가되어 있음 — 다른 네트워크/IP로 바뀌면 이 값도 갱신 필요.
+- **iOS Safari는 HTTPS(또는 정확히 `localhost`)가 아니면 Service Worker/Push API 자체가 생성되지 않는다.** `http://<LAN IP>:3001`처럼 평범한 HTTP LAN 주소는 iOS 기준 보안 컨텍스트가 아니어서 웹 푸시를 절대 테스트할 수 없다 (iOS 버전, 홈 화면 추가 여부와 무관). 모바일에서 푸시까지 테스트하려면 HTTPS 터널(ngrok/Cloudflare Tunnel 등) 또는 실제 배포 도메인이 필요 — **2026-07-31 기준 미해결.**
+- 카카오 로그인(아래 10.3)까지 테스트하려면 웹/API의 `KAKAO_REDIRECT_URI` 값을 현재 접속 방식(localhost vs LAN IP vs 프로덕션 도메인)에 맞는 값으로 맞춰서 재시작해야 함 — 세 값을 동시에 쓸 수 없고 하나만 활성화됨.
+
+### 10.3 카카오 로그인
+- 카카오 디벨로퍼스 앱 "뉴스핑" (app id 1529370)에 리다이렉트 URI 3개 등록됨:
+  - `https://saerolab.com/login/kakao/callback` (프로덕션)
+  - `http://localhost:3001/login/kakao/callback` (데스크톱 로컬)
+  - `http://192.168.35.65:3001/login/kakao/callback` (LAN/모바일 로컬 — IP 바뀌면 재등록 필요)
+- **리다이렉트 URI는 반드시 `/login/kakao/callback` (Next.js 페이지, code를 파싱해 API를 POST로 호출)이어야 하며, `/api/auth/kakao/callback` (백엔드 POST 전용 엔드포인트)를 직접 가리키면 안 된다.** 브라우저 리다이렉트가 그 페이지로 갈 수 없기 때문.
+- `KAKAO_CLIENT_ID`는 반드시 **REST API 키**여야 함(JS/Native/Admin 키 아님).
+- Client Secret이 카카오 콘솔에서 활성화되어 있어 토큰 교환 시 `KAKAO_CLIENT_SECRET`이 필수 (`apps/api/src/api/auth/providers/kakao.ts`).
+- 웹의 `NEXT_PUBLIC_KAKAO_REDIRECT_URI`와 API의 `KAKAO_REDIRECT_URI`는 항상 **완전히 동일한 값**이어야 함.
+
+### 10.4 Firebase
+- 프로젝트: `news-ping-38eda`. 두 가지 설정을 절대 혼동하지 말 것:
+  - **클라이언트 웹 설정**(apiKey/authDomain/projectId/storageBucket/messagingSenderId/appId) → `apps/web/.env.local`의 `NEXT_PUBLIC_FIREBASE_*` (비밀값 아님, 브라우저에 노출되어도 무방)
+  - **Admin SDK 서비스 계정 JSON**(type/project_id/private_key/client_email 등, Firebase 콘솔 > 프로젝트 설정 > 서비스 계정 > 새 비공개 키 생성) → `apps/api/.env`의 `FIREBASE_SERVICE_ACCOUNT_JSON`
+- `FIREBASE_SERVICE_ACCOUNT_JSON`은 **반드시 한 줄**이어야 한다. dotenv는 멀티라인 값을 지원하지 않아 pretty-print된 JSON을 그대로 붙여넣으면 `{` 한 글자만 읽혀 서버가 크래시한다.
+- VAPID 키(웹 푸시 인증서, Firebase 콘솔 > 프로젝트 설정 > Cloud Messaging 탭) → `apps/web/.env.local`의 `NEXT_PUBLIC_FIREBASE_VAPID_KEY`.
+- 클라이언트 푸시 코드: `apps/web/lib/firebase.ts`, `apps/web/lib/push.ts`, `apps/web/public/firebase-messaging-sw.js`, 등록 UI는 `apps/web/app/mypage/profile/page.tsx`. `firebase/messaging`의 `isSupported()`는 iOS Safari를 오탐(false)하는 경우가 많아 사용하지 않고 `Notification`/`serviceWorker`/`PushManager` 존재 여부를 직접 확인한다. iOS non-standalone 체크가 이 존재 여부 체크보다 **먼저** 와야 정확한 안내 문구가 나온다 (순서 중요).
+- `apps/api/src/db/repositories/push-token.repository.ts` 기준, 2026-07-31 세션 종료 시점 등록된 푸시 토큰 0개 — 아직 실기기 푸시 수신은 검증 안 됨 (10.2의 HTTPS 이슈 때문).
+
+### 10.5 뉴스 크롤링
+- `apps/api/src/pipeline/crawler/sources.ts`에 12개 소스 등록: 연합뉴스, 동아일보, 경향신문, 한겨레, 세계일보, 국민일보, 한국경제, 서울경제, 머니투데이, 이데일리, 아시아경제, 구글뉴스(한국).
+- 제외됨(RSS 서비스 종료/차단 확인): 조선일보, 중앙일보, 문화일보, 서울신문, 파이낸셜뉴스, 한국일보, 매일경제(Cloudflare 차단), 네이버뉴스·다음뉴스(포털 통합 RSS 미제공).
+- `apps/api/src/pipeline/crawler/index.ts`: 언론사마다 봇 차단 기준이 반대라(일부는 User-Agent 없어야 통과, 일부는 있어야 통과) User-Agent 없이 먼저 요청 후 실패 시에만 붙여서 재시도한다. 국민일보는 EUC-KR 응답이라 XML 프롤로그의 `encoding`을 감지해 `iconv-lite`로 변환한다.
+- 수동 트리거: `curl -H "Authorization: Bearer <CRON_SECRET>" http://localhost:4000/internal/pipeline/crawl-and-match`
+- 키워드 매칭은 **그 크롤 실행에서 새로 수집된 기사에만** 적용된다 (이미 저장된 기사에 소급 적용 안 됨).
+
+### 10.6 DB
+- Neon Postgres 연결됨, 초기 마이그레이션 `prisma/migrations/20260730162258_init` 적용 완료. 스키마 변경 시 `cd apps/api && npx prisma migrate dev --name <설명>`.
+
+### 10.7 보안 — 미해결 TODO
+- **`apps/api/.env.example`(git 추적 파일)에 실제 Neon DB 비밀번호와 카카오 Client Secret이 그대로 남아있다.** 커밋 전 반드시 빈 플레이스홀더로 정리할 것. `.env`/`.env.local`은 정상적으로 gitignore 처리되어 있어 안전함.
+
+### 10.8 배포 (아직 미실행, 코드 기준 확인된 내용만)
+- `apps/web/vercel.ts`: `/api/*` → `${API_ORIGIN}/api/$1` rewrite (web Vercel 프로젝트에 `API_ORIGIN` env 필요, 예: `https://newkey-api.vercel.app`)
+- `apps/api/vercel.ts`: 전체 요청을 `/api/$1`로 rewrite + `crawl-and-match`를 5분마다 도는 Vercel Cron 등록(해당 프로젝트에 `CRON_SECRET` env 설정 시 자동으로 Authorization 헤더 실어 보냄)
+- 프로덕션에선 `KAKAO_REDIRECT_URI`/`NEXT_PUBLIC_KAKAO_REDIRECT_URI`를 `https://saerolab.com/login/kakao/callback`으로, `DATABASE_URL`(pooled)과 `DIRECT_URL`(unpooled)을 분리 설정, `FIREBASE_SERVICE_ACCOUNT_JSON`도 한 줄로, `WEB_ORIGIN`도 실제 프로덕션 도메인으로 설정해야 함.
+
+---
+
 *본 문서는 초기 요구사항 정의를 위한 v1 초안이며, 상세 API 명세 및 화면 설계(와이어프레임)는 후속 문서에서 다룬다.*
