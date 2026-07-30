@@ -1,0 +1,22 @@
+{
+  "name": "newkey",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=packages/shared",
+    "predev:web": "npm run build:shared",
+    "predev:api": "npm run build:shared",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "prebuild": "npm run build:shared",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "dependencies": {
+    "firebase": "^12.16.0"
+  }
+}
