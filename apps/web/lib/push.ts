@@ -19,26 +19,39 @@ function isStandalone(): boolean {
   );
 }
 
-export async function setupPushNotifications(): Promise<PushSetupResult> {
-  if (typeof window === "undefined") {
-    return { status: "unsupported" };
-  }
+function pushEnvironmentStatus(): "ok" | "unsupported" | "ios-requires-home-screen" {
+  if (typeof window === "undefined") return "unsupported";
 
   // iOS는 홈 화면에 추가되어 standalone으로 실행 중이 아니면 Notification/PushManager API 자체가
   // 존재하지 않는다. 이 케이스를 먼저 걸러내야 "지원 안 함"이 아니라 정확한 안내를 보여줄 수 있다.
-  if (isIos() && !isStandalone()) {
-    return { status: "ios-requires-home-screen" };
-  }
+  if (isIos() && !isStandalone()) return "ios-requires-home-screen";
 
   // firebase/messaging의 isSupported()는 iOS 16.4+ 홈 화면 PWA에서도 Safari라는 이유만으로
   // false를 반환하는 경우가 많다(SDK가 구형 Safari 기준으로 판별). 그래서 실제 필요한 브라우저 API
   // (Notification, serviceWorker, PushManager)가 있는지 직접 확인하고, isSupported()는 쓰지 않는다.
   if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
-    return { status: "unsupported" };
+    return "unsupported";
+  }
+
+  return "ok";
+}
+
+// 알림 권한은 브라우저가 영구적으로 기억한다 (React state와 달리 새로고침해도 남아있음).
+// 페이지 로드 시 이 함수로 실제 상태를 조회해서 버튼 상태를 정확히 반영해야 한다.
+export function hasGrantedPushPermission(): boolean {
+  return pushEnvironmentStatus() === "ok" && Notification.permission === "granted";
+}
+
+export async function setupPushNotifications(): Promise<PushSetupResult> {
+  const envStatus = pushEnvironmentStatus();
+  if (envStatus !== "ok") {
+    return { status: envStatus };
   }
 
   const { getMessaging, getToken } = await import("firebase/messaging");
 
+  // 이미 허용된 상태면 UI 프롬프트 없이 즉시 "granted"로 resolve된다 (스펙 동작) — 매 방문마다
+  // 조용히 재호출해서 토큰을 최신 상태로 재등록하는 데 안전하게 쓸 수 있다.
   const permission = await Notification.requestPermission();
   if (permission !== "granted") {
     return { status: "denied" };

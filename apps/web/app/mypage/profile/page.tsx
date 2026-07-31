@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { userApi, type UserProfileDto } from "@/lib/api/user";
 import { authApi } from "@/lib/api/auth";
-import { setupPushNotifications } from "@/lib/push";
+import { hasGrantedPushPermission, setupPushNotifications } from "@/lib/push";
 import { useRouter } from "next/navigation";
 
 type PushUiStatus = "idle" | "requesting" | "granted" | "denied" | "unsupported" | "ios-requires-home-screen" | "error";
@@ -22,15 +22,24 @@ export default function ProfilePage() {
     });
   }, []);
 
+  useEffect(() => {
+    // 알림 권한은 브라우저가 영구 기억하지만 이 컴포넌트의 상태는 새로고침마다 초기화된다.
+    // 이미 허용된 기기라면 버튼에 "등록됨"을 바로 반영하고, 토큰도 조용히 재등록해 서버와 동기화한다.
+    if (!hasGrantedPushPermission()) return;
+    setupPushNotifications()
+      .then((result) => {
+        if (result.status === "granted") {
+          setPushStatus("granted");
+          return userApi.registerPushToken(result.token);
+        }
+      })
+      .catch((e) => console.error("푸시 토큰 재등록 실패:", e));
+  }, []);
+
   if (!profile) return <p className="text-sm text-gray-500">불러오는 중...</p>;
 
   async function handleSave() {
     const updated = await userApi.updateMe({ nickname });
-    setProfile(updated);
-  }
-
-  async function handleToggleNotification() {
-    const updated = await userApi.updateMe({ notificationEnabled: !profile!.notificationEnabled });
     setProfile(updated);
   }
 
@@ -73,18 +82,6 @@ export default function ProfilePage() {
             저장
           </button>
         </div>
-      </div>
-
-      <div className="flex items-center justify-between rounded-lg border border-black/10 px-3 py-2 dark:border-white/10">
-        <span className="text-sm">알림 수신</span>
-        <button
-          onClick={handleToggleNotification}
-          className={`rounded-full px-3 py-1 text-xs ${
-            profile.notificationEnabled ? "bg-black text-white dark:bg-white dark:text-black" : "bg-black/10 dark:bg-white/10"
-          }`}
-        >
-          {profile.notificationEnabled ? "켜짐" : "꺼짐"}
-        </button>
       </div>
 
       <div className="flex flex-col gap-2 rounded-lg border border-black/10 px-3 py-2 dark:border-white/10">

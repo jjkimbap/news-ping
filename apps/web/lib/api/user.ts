@@ -3,7 +3,6 @@ import { apiClient } from "./client";
 export interface UserProfileDto {
   id: string;
   nickname: string;
-  notificationEnabled: boolean;
   onboardingCompleted: boolean;
   createdAt: string;
   readonly: {
@@ -14,8 +13,7 @@ export interface UserProfileDto {
 
 export const userApi = {
   getMe: () => apiClient.get<UserProfileDto>("/users/me"),
-  updateMe: (input: { nickname?: string; notificationEnabled?: boolean }) =>
-    apiClient.patch<UserProfileDto>("/users/me", input),
+  updateMe: (input: { nickname?: string }) => apiClient.patch<UserProfileDto>("/users/me", input),
   completeOnboarding: () =>
     apiClient.post<UserProfileDto>("/users/me/onboarding-complete"),
   registerPushToken: (token: string) =>

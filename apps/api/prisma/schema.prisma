@@ -22,7 +22,6 @@ model User {
   providerUid          String
   nickname             String
   profileImage         String?
-  notificationEnabled  Boolean   @default(true)
   onboardingCompleted  Boolean   @default(false)
   createdAt            DateTime  @default(now())
 

@@ -27,7 +27,7 @@ export const userRepository = {
     });
   },
 
-  updateProfile(id: string, data: { nickname?: string; notificationEnabled?: boolean }) {
+  updateProfile(id: string, data: { nickname?: string }) {
     return prisma.user.update({ where: { id }, data });
   },
 

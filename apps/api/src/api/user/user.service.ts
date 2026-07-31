@@ -9,10 +9,7 @@ export const userService = {
     return user;
   },
 
-  async updateProfile(
-    userId: string,
-    input: { nickname?: string; notificationEnabled?: boolean },
-  ) {
+  async updateProfile(userId: string, input: { nickname?: string }) {
     return userRepository.updateProfile(userId, input);
   },
 

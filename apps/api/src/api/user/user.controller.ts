@@ -7,14 +7,12 @@ function toProfileDto(user: {
   provider: string;
   nickname: string;
   profileImage: string | null;
-  notificationEnabled: boolean;
   onboardingCompleted: boolean;
   createdAt: Date;
 }) {
   return {
     id: user.id,
     nickname: user.nickname,
-    notificationEnabled: user.notificationEnabled,
     onboardingCompleted: user.onboardingCompleted,
     createdAt: user.createdAt.toISOString(),
     // provider/profileImage는 간편로그인 원본 정보라 조회만 가능, 프론트에서 수정불가 표시로 렌더링
@@ -32,8 +30,8 @@ export const userController = {
   },
 
   async updateMe(req: AuthedRequest, res: Response) {
-    const { nickname, notificationEnabled } = req.body;
-    const user = await userService.updateProfile(req.userId!, { nickname, notificationEnabled });
+    const { nickname } = req.body;
+    const user = await userService.updateProfile(req.userId!, { nickname });
     res.json(toProfileDto(user));
   },
 

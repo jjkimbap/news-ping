@@ -7,7 +7,6 @@ export interface UserDto {
   provider: AuthProvider;
   nickname: string;
   profileImage: string | null;
-  notificationEnabled: boolean;
   onboardingCompleted: boolean;
   createdAt: string;
 }

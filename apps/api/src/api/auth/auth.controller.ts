@@ -15,7 +15,6 @@ function toUserDto(user: {
   provider: string;
   nickname: string;
   profileImage: string | null;
-  notificationEnabled: boolean;
   onboardingCompleted: boolean;
   createdAt: Date;
 }) {
@@ -24,7 +23,6 @@ function toUserDto(user: {
     provider: user.provider,
     nickname: user.nickname,
     profileImage: user.profileImage,
-    notificationEnabled: user.notificationEnabled,
     onboardingCompleted: user.onboardingCompleted,
     createdAt: user.createdAt.toISOString(),
   };

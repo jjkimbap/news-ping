@@ -12,10 +12,30 @@ firebase.initializeApp({
   appId: "1:717755756911:web:81f272d8fd0657e15a789a",
 });
 
+// 새 버전 배포 시 기존에 등록된(오래된) 서비스 워커가 계속 쓰이지 않도록 즉시 교체한다.
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
   const title = payload.notification?.title ?? "키워드 뉴스 알림";
   const body = payload.notification?.body ?? "";
-  self.registration.showNotification(title, { body });
+  const url = payload.data?.url ?? "/mypage/notifications";
+  self.registration.showNotification(title, { body, data: { url } });
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = new URL(event.notification.data?.url ?? "/mypage/notifications", self.location.origin).href;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      const existing = clients.find((c) => c.url.startsWith(self.location.origin));
+      if (existing) {
+        return existing.navigate(url).then((c) => c.focus());
+      }
+      return self.clients.openWindow(url);
+    }),
+  );
 });
