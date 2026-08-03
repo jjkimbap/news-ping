@@ -1,10 +1,16 @@
 import { collectNewArticles } from "./crawler/index.js";
 import { matchArticleAgainstKeywords } from "./matcher/index.js";
 import { sendGroupedPush, type UserNotificationBatch } from "./pusher/index.js";
+import { articleRepository } from "../db/repositories/article.repository.js";
 import { keywordRepository } from "../db/repositories/keyword.repository.js";
 import { notificationRepository } from "../db/repositories/notification.repository.js";
 
+const ARTICLE_RETENTION_DAYS = 14;
+
 export async function runCrawlAndMatch() {
+  const retentionCutoff = new Date(Date.now() - ARTICLE_RETENTION_DAYS * 24 * 60 * 60 * 1000);
+  await articleRepository.deleteOlderThan(retentionCutoff);
+
   const newArticles = await collectNewArticles();
   if (newArticles.length === 0) {
     return { articlesCollected: 0, notificationsCreated: 0 };
