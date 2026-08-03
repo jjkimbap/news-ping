@@ -1,4 +1,4 @@
-import type { MatchNotificationDto, PaginatedResult } from "@newkey/shared";
+import type { MatchNotificationDto, PaginatedResult } from "@newsping/shared";
 import { apiClient } from "./client";
 
 export const notificationsApi = {

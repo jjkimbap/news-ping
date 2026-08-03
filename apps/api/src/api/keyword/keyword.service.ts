@@ -1,4 +1,4 @@
-import { MAX_KEYWORDS_PER_USER } from "@newkey/shared";
+import { MAX_KEYWORDS_PER_USER } from "@newsping/shared";
 import { keywordRepository } from "../../db/repositories/keyword.repository.js";
 import { normalizeKeyword } from "../../common/normalize.js";
 import { Errors } from "../../common/errors.js";

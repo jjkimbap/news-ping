@@ -1,5 +1,5 @@
 {
-  "name": "@newkey/web",
+  "name": "@newsping/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@newkey/shared": "*",
+    "@newsping/shared": "*",
     "firebase": "^12.16.0",
     "next": "16.2.12",
     "react": "19.2.4",

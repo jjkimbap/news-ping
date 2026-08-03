@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MAX_KEYWORDS_PER_USER, type KeywordDto } from "@newkey/shared";
+import { MAX_KEYWORDS_PER_USER, type KeywordDto } from "@newsping/shared";
 import { keywordsApi } from "@/lib/api/keywords";
 import { ApiRequestError } from "@/lib/api/client";
 

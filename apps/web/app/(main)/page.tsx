@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { ArticleDto, TrendingKeywordDto } from "@newkey/shared";
+import type { ArticleDto, TrendingKeywordDto } from "@newsping/shared";
 import { newsApi } from "@/lib/api/news";
 import { statsApi } from "@/lib/api/stats";
 

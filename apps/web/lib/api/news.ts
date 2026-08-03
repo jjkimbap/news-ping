@@ -1,4 +1,4 @@
-import type { ArticleDto, PaginatedResult } from "@newkey/shared";
+import type { ArticleDto, PaginatedResult } from "@newsping/shared";
 import { apiClient } from "./client";
 
 export const newsApi = {

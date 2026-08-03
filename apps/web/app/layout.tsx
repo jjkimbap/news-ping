@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NewKey - 키워드 뉴스 알림",
+  title: "News Ping - 키워드 뉴스 알림",
   description: "관심 키워드가 포함된 뉴스를 실시간으로 받아보세요.",
   manifest: "/manifest.json",
 };

@@ -1,4 +1,4 @@
-import { NOTIFICATION_PAGE_SIZE } from "@newkey/shared";
+import { NOTIFICATION_PAGE_SIZE } from "@newsping/shared";
 import { notificationRepository } from "../../db/repositories/notification.repository.js";
 import { Errors } from "../../common/errors.js";
 

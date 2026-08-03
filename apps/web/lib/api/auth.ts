@@ -1,4 +1,4 @@
-import type { UserDto } from "@newkey/shared";
+import type { UserDto } from "@newsping/shared";
 import { apiClient } from "./client";
 
 export const authApi = {

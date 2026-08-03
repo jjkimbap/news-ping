@@ -3,7 +3,7 @@ export default function AboutPage() {
     <article className="prose prose-sm dark:prose-invert">
       <h1>서비스 소개</h1>
       <p>
-        NewKey는 사용자가 등록한 키워드가 포함된 뉴스를 온라인 언론사에서 실시간(준실시간)으로
+        News Ping은 사용자가 등록한 키워드가 포함된 뉴스를 온라인 언론사에서 실시간(준실시간)으로
         수집하여 알려주는 키워드 뉴스 알림 서비스입니다.
       </p>
       <h2>주요 기능</h2>

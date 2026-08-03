@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { AuthProvider } from "@newkey/shared";
+import type { AuthProvider } from "@newsping/shared";
 
 // TODO: 실제 DB(Neon 등) 연동 전까지 사용하는 임시 인메모리 저장소.
 // 프로세스가 재시작되면 데이터가 초기화되고, 서버리스 환경에서는 인스턴스 간 공유되지 않는다.
@@ -51,7 +51,7 @@ export interface PushTokenRecord {
 }
 
 const globalForStore = globalThis as unknown as {
-  __newkeyMemoryStore?: {
+  __newspingMemoryStore?: {
     users: UserRecord[];
     keywords: KeywordRecord[];
     articles: ArticleRecord[];
@@ -62,8 +62,8 @@ const globalForStore = globalThis as unknown as {
 
 // 개발 중 hot-reload(tsx watch)로 모듈이 재평가돼도 데이터가 유지되도록 globalThis에 보관한다.
 export const store =
-  globalForStore.__newkeyMemoryStore ??
-  (globalForStore.__newkeyMemoryStore = {
+  globalForStore.__newspingMemoryStore ??
+  (globalForStore.__newspingMemoryStore = {
     users: [],
     keywords: [],
     articles: [],
