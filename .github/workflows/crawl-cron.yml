@@ -1,0 +1,17 @@
+name: Crawl and match news
+
+on:
+  schedule:
+    # Vercel Hobby 플랜은 5분 주기 크론을 지원하지 않아 GitHub Actions로 대신 호출한다.
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call crawl-and-match endpoint
+        run: |
+          curl -sf -m 55 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://news-ping-api.vercel.app/internal/pipeline/crawl-and-match
