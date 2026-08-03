@@ -57,7 +57,9 @@ export async function setupPushNotifications(): Promise<PushSetupResult> {
     return { status: "denied" };
   }
 
-  const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+  // navigator.serviceWorker.register()도 raw 브라우저 API라 basePath가 자동으로 안 붙는다.
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const registration = await navigator.serviceWorker.register(`${basePath}/firebase-messaging-sw.js`);
   const messaging = getMessaging(getFirebaseApp());
   const token = await getToken(messaging, {
     vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,

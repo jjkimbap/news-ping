@@ -10,8 +10,12 @@ export class ApiRequestError extends Error {
   }
 }
 
+// Next.js는 raw fetch() 호출에 basePath를 자동으로 붙여주지 않으므로 직접 붙인다.
+// 로컬 개발에서는 비워두고, saerolab.com/news-ping 프록시 하위로 배포될 때만 값을 설정한다.
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${BASE_PATH}/api${path}`, {
     ...init,
     credentials: "include",
     headers: {
