@@ -1,15 +1,20 @@
 {
   "name": "News Ping - 키워드 뉴스 알림",
   "short_name": "News Ping",
-  "start_url": "/",
+  "start_url": "/news-ping",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#3B5EC2",
   "icons": [
     {
-      "src": "/globe.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/news-ping/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/news-ping/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
