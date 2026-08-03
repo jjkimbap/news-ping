@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { MatchNotificationDto } from "@newkey/shared";
+import type { MatchNotificationDto } from "@newsping/shared";
 import { notificationsApi } from "@/lib/api/notifications";
 
 export default function NotificationsPage() {

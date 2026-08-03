@@ -1,4 +1,4 @@
-import { NEWS_FEED_PAGE_SIZE } from "@newkey/shared";
+import { NEWS_FEED_PAGE_SIZE } from "@newsping/shared";
 import { articleRepository } from "../../db/repositories/article.repository.js";
 
 export const newsService = {

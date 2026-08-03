@@ -4,7 +4,7 @@ export default function ContactPage() {
       <h1>문의</h1>
       <p>서비스 이용 중 문의사항이 있으시면 아래 연락처로 문의해주세요.</p>
       <ul>
-        <li>이메일: support@newkey.app</li>
+        <li>이메일: support@newsping.app</li>
       </ul>
     </article>
   );

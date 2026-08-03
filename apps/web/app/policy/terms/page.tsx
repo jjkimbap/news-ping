@@ -2,7 +2,7 @@ export default function TermsPage() {
   return (
     <article className="prose prose-sm dark:prose-invert">
       <h1>이용약관</h1>
-      <p>본 약관은 NewKey(이하 &ldquo;서비스&rdquo;)의 이용과 관련하여 회사와 이용자 간의 권리, 의무를 규정합니다.</p>
+      <p>본 약관은 News Ping(이하 &ldquo;서비스&rdquo;)의 이용과 관련하여 회사와 이용자 간의 권리, 의무를 규정합니다.</p>
       <h2>제1조 (서비스의 내용)</h2>
       <p>
         서비스는 이용자가 등록한 키워드가 포함된 뉴스 기사를 언론사 공식 RSS/API 등을 통해

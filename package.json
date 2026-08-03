@@ -1,5 +1,5 @@
 {
-  "name": "newkey",
+  "name": "news-ping",
   "private": true,
   "workspaces": [
     "apps/*",

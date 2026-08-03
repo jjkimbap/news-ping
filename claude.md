@@ -1,6 +1,6 @@
 # 키워드 뉴스 알림 서비스 PRD (Product Requirements Document)
 
-**프로젝트명:** NewKey (가칭)
+**프로젝트명:** News Ping
 **문서 버전:** v1.0
 **작성일:** 2026-07-30
 

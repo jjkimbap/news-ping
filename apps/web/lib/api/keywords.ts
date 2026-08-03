@@ -1,4 +1,4 @@
-import type { KeywordDto } from "@newkey/shared";
+import type { KeywordDto } from "@newsping/shared";
 import { apiClient } from "./client";
 
 export const keywordsApi = {

@@ -5,7 +5,7 @@ export function NavBar() {
     <header className="border-b border-black/10 dark:border-white/10">
       <nav className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
         <Link href="/" className="font-semibold">
-          NewKey
+          News Ping
         </Link>
         <div className="flex gap-4 text-sm">
           <Link href="/mypage/notifications">알림</Link>

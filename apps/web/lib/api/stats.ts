@@ -1,4 +1,4 @@
-import type { KeywordTrendPointDto, PressVolumeDto, TrendingKeywordDto } from "@newkey/shared";
+import type { KeywordTrendPointDto, PressVolumeDto, TrendingKeywordDto } from "@newsping/shared";
 import { apiClient } from "./client";
 
 export const statsApi = {

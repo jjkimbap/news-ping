@@ -1,6 +1,6 @@
 {
-  "name": "NewKey - 키워드 뉴스 알림",
-  "short_name": "NewKey",
+  "name": "News Ping - 키워드 뉴스 알림",
+  "short_name": "News Ping",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

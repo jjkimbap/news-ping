@@ -1,5 +1,5 @@
 {
-  "name": "@newkey/api",
+  "name": "@newsping/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,7 +13,7 @@
     "prisma:migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
-    "@newkey/shared": "*",
+    "@newsping/shared": "*",
     "@prisma/client": "^6.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
